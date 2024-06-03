@@ -258,7 +258,7 @@ impl IndexWriterWorker {
                     info!("running auto commit");
 
                     // We know we wont shutdown.
-                    let _ = self.handle_message(WriterOp::Commit, None);
+                    self.handle_message(WriterOp::Commit, None);
                     op_since_last_commit = false;
                 },
                 Err(RecvTimeoutError::Disconnected) => {
@@ -469,7 +469,7 @@ fn start_writer(
 
     let pk_field = schema
         .get_field(PRIMARY_KEY)
-        .ok_or_else(|| anyhow!("No primary key field in schema. This is a bug."))?;
+        .map_err(|_| anyhow!("No primary key field in schema. This is a bug."))?;
 
     let mut worker = IndexWriterWorker {
         reader,
